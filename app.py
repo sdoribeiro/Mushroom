@@ -65,6 +65,7 @@ mrve3 = Sell('MRVE3.SA', datetime.datetime(2022,1,21),100.0, 12.09 , 0.0)
 mrve4 = Buy('MRVE3.SA', datetime.datetime(2022,3,15),100.00, 9.96 , 0.0)
 mrve5 = Sell('MRVE3.SA', datetime.datetime(2022,3,17),100.0, 10.12 , 0.0)
 
+"""
 class PortifolioRef:
     def __init__(self, name):
         self.name = name
@@ -80,6 +81,8 @@ print("Portifolio Ref")
 print(pf1.name)
 for Asset in pf1.assets:
     print('{} {}'.format(Asset.name, Asset.perc ))
+
+"""
 
 class Carteira:
     def __init__(self, name, asset):
@@ -107,19 +110,20 @@ Mprice = 0.0
 QtdAsset = 0.0
 
 for Operation in SAPR.operations:
-    if Operation.ope > 0:
+    if Operation.ope > 0: # buy
         if Mprice == 0:
             Mprice = Operation.price
             QtdAsset = Operation.quantity
-        else:
+        else:  #sell
             Mprice = round(((Mprice * QtdAsset) + (Operation.price * Operation.quantity))/ (QtdAsset + Operation.quantity),2)
             QtdAsset = QtdAsset + Operation.quantity
     else:
             QtdAsset = QtdAsset - Operation.quantity
+            
     print('{} {} {} {} {} {}'.format(Operation.date, Operation.asset, Operation.quantity, Operation.price , Operation.ope, Mprice))
 
-print (QtdAsset)
-print (QtdAsset * Mprice)
+print ('Qtd Total: {}',QtdAsset)
+print ('Vlr total: {}',QtdAsset * Mprice)
 # Quantidade total de assets, preco total
 
 Mprice = 0.0
@@ -137,8 +141,8 @@ for Operation in MRVE.operations:
             QtdAsset = QtdAsset - Operation.quantity
     print('{} {} {} {} {} {}'.format(Operation.date, Operation.asset, Operation.quantity, Operation.price , Operation.ope, Mprice))
 
-print (QtdAsset)
-print (QtdAsset * Mprice)
+print ('Qtd Total: {}',QtdAsset)
+print ('Vlr total: {}',QtdAsset * Mprice)
 
 
 
