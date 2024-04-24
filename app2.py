@@ -88,7 +88,7 @@ mrve3 = Sell('MRVE3.SA', datetime.datetime(2022,1,21),100.0, 12.09 , 0.0)
 mrve4 = Buy('MRVE3.SA', datetime.datetime(2022,3,15),100.00, 9.96 , 0.0)
 mrve5 = Sell('MRVE3.SA', datetime.datetime(2022,3,17),100.0, 10.12 , 0.0)
 
-stock1 = Carteira ('Carteira de Acoes', 'SAPR.SA') 
+stock1 = Carteira ('Posicao em SAPR', 'SAPR.SA') 
 print("#### 2 ####")
 print(stock1)
 # Adiciona operacoes SAPR
@@ -102,7 +102,7 @@ print(stock1)
 
 print("#### 3 ####")
 
-stock2 = Carteira ('Carteira MRVE', 'MRVE3.SA')
+stock2 = Carteira ('Posicao em  MRVE', 'MRVE3.SA')
 print(stock2)
 # Adiciona operacoes MRVE
 
@@ -128,7 +128,6 @@ class CarteiraReal:
     def add_asset(self, asset):
         self.composicao[asset.asset+"_$"] = (asset.Mprice * asset.QtdAsset)
         self.vlrTotal = self.vlrTotal + (asset.Mprice * asset.QtdAsset)
-        #self.composicao[asset.asset+"_%"] = (asset.Mprice * asset.QtdAsset) / self.vlrTotal
     
     def calc_perc(self):
         aux = {}
@@ -143,18 +142,14 @@ class CarteiraReal:
         return f"Class CarteiraReal: {self.name} | {self.vlrTotal} | {self.composicao}"
 
 
-CR = CarteiraReal("CR")
+CR = CarteiraReal("Carteira Real")
 CR.add_asset(stock2)
 print(CR)
 CR.add_asset(stock1)
 print(CR)
-
 CR.calc_perc()
 
 print(CR)
-
-#for x in CR.composicao.items():
-#    print(x)
 
 
 
