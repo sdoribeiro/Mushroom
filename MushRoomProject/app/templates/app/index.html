@@ -1,0 +1,17 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Hello!</title>
+        <link href="{% static 'app/styles.css' %}" rel="stylesheet">
+    </head>
+    <body>
+        {% if name == 'Sandro' %}
+            <h1>Hello, master  {{ name }}!</h1>
+        {% else %}
+            <h1>Hello,  {{ name }}!</h1>
+        {% endif %}
+        
+    </body>
+</html>

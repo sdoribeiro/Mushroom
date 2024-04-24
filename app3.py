@@ -1,12 +1,12 @@
 import yfinance as yf
 import json
 import datetime
-  
+
 # Automacao da gestao de uma carteira de investimentos com base nos percentuais de alocacao pre estabelecidos
 # e ativos selecionados.
 
 class Asset:
-    def __init__(self, ticker):
+    def __init__(self, ticker, perc):
         self.ticker = ticker
         # using yfinance to get ticker data
         stock_obj = yf.Ticker(ticker)
@@ -15,13 +15,33 @@ class Asset:
         # Parsing the JSON here
         meta_obj = json.loads(validated)
         self.name = meta_obj['shortName']
+        self.name = ticker
+       
         self.price = meta_obj['previousClose']
+        # adding fields Carteira
+        self.operations = []
+        self.Mprice = 0
+        self.QtdAsset = 0
+        self.perc = perc
+
+    def add_opp(self, operation):
+        self.operations.append(operation)
+        if operation.ope > 0: # buy
+           # Calc average price
+           if self.Mprice == 0:
+              self.Mprice = operation.price
+              self.QtdAsset = operation.quantity
+           else:  #sell
+               self.Mprice = round(((self.Mprice * self.QtdAsset) + (operation.price * operation.quantity))/ (self.QtdAsset + operation.quantity),2)
+               self.QtdAsset = self.QtdAsset + operation.quantity
+        else:
+            self.QtdAsset = self.QtdAsset - operation.quantity
 
     def __str__(self):
-        return f"Asset class: Ticker {self.ticker} | Name {self.name} | Price {self.price}"
-
+        return f"Asset class: Ticker {self.ticker} | Name {self.name} | Price: {self.price} | Perc: {self.perc} | Mprice: {self.Mprice} | QtdAsset: {self.QtdAsset}"
+  
 class Reit(Asset):
-    pass
+    pass 
 
 class Operation:
     def __init__(self, asset, date, quantity, price, tax):
@@ -48,37 +68,18 @@ class Sell(Operation):
      def __str__(self):
         return f"Sell Operation: Asset {self.asset} | Date {self.date} | Qtd {self.quantity} | Price  {self.price * self.ope} | {self.tax}"
 
-class CarteiraRef:
-    def __init__(self, name, asset, perc):
-        self.name = name
-        self.asset = asset
-        self.operations = []
-        self.Mprice = 0
-        self.QtdAsset = 0
-        self.perc = perc
 
-    def add_opp(self, operation):
-        self.operations.append(operation)
-        if operation.ope > 0: # buy
-           
-           # Calc preco medio
-           if self.Mprice == 0:
-              self.Mprice = operation.price
-              self.QtdAsset = operation.quantity
-           else:  #sell
-               self.Mprice = round(((self.Mprice * self.QtdAsset) + (operation.price * operation.quantity))/ (self.QtdAsset + operation.quantity),2)
-               self.QtdAsset = self.QtdAsset + operation.quantity
-        else:
-            self.QtdAsset = self.QtdAsset - operation.quantity
+print("### 1 ### Criacao Assets")
+SAPR = Asset('SAPR11.SA', 90.0)
+MRVE = Asset('MRVE3.SA', 10.0)
+ITSA = Asset('ITSA4.SA', 10)
+ABEV = Asset('ABEV3.SA', 10.0)
 
-    def __str__(self):
-        return f"Class CarteiraRef: {self.name} | {self.asset} | {self.perc} |{self.Mprice} | {self.QtdAsset})"
-
-print("#### 1 ####")
-SAPR = Asset('SAPR11.SA')
 print(SAPR)
-MRVE = Asset('MRVE3.SA')
 print(MRVE)
+print(ITSA)
+print(ABEV)
+
 
 # Conjunto de Operacoes SAPR11
 sapr1 = Buy('SAPR11.SA', datetime.datetime(2021,12,31),300.0, 24.68, 0.0 )
@@ -89,74 +90,81 @@ mrve2 = Buy('MRVE3.SA', datetime.datetime(2021,10,27),100.0, 10.66 , 0.0)
 mrve3 = Sell('MRVE3.SA', datetime.datetime(2022,1,21),100.0, 12.09 , 0.0)
 mrve4 = Buy('MRVE3.SA', datetime.datetime(2022,3,15),100.00, 9.96 , 0.0)
 mrve5 = Sell('MRVE3.SA', datetime.datetime(2022,3,17),100.0, 10.12 , 0.0)
+# Conjunto de Operacoes ITSA4
+itsa1 = Buy('ITSA4.SA', datetime.datetime(2022,5,4),500,8.90,6.91)
+itsa2 = Buy('ITSA4.SA', datetime.datetime(2022,11,11),50,13.65,0.0)
+itsa3 = Buy('ITSA4.SA', datetime.datetime(2023,9,22),7,6.50,0.0)
+itsa4 = Buy('ITSA4.SA', datetime.datetime(2023,10,30),27,17.92,0.0)
+# Conjunto de Operacoes ABEV3
+#abev1 = Buy('ABEV3.SA', datetime.datetime(2022,5,18),500,17.92,0.0)
 
-stock1 = CarteiraRef ('Carteira SAPR', SAPR, 90.0) 
-print("#### 2 #### - stock1")
-print(stock1)
+print("### 2 ### Inclusao de Operacoes")
+
 # Adiciona operacoes SAPR
-stock1.add_opp(sapr1)
-stock1.add_opp(sapr2)
-print(stock1)
+SAPR.add_opp(sapr1)
+SAPR.add_opp(sapr2)
 
-print("#### 3 #### - stock2")
-
-stock2 = CarteiraRef ('Carteira MRVE', MRVE, 10.0)
-print(stock2)
 # Adiciona operacoes MRVE
-stock2.add_opp(mrve1)
-stock2.add_opp(mrve2)
-stock2.add_opp(mrve3)
-stock2.add_opp(mrve4)
-stock2.add_opp(mrve5)
-print (stock2)
+MRVE.add_opp(mrve1)
+MRVE.add_opp(mrve2)
+MRVE.add_opp(mrve3)
+MRVE.add_opp(mrve4)
+MRVE.add_opp(mrve5)
+
+# Adiciona Operacoes ITSA4
+ITSA.add_opp(itsa1)
+ITSA.add_opp(itsa2)
+ITSA.add_opp(itsa3)
+ITSA.add_opp(itsa4)
+
+# Adiciona Operacoes ABEV
+
+print("# Exibe situacao ativos")
+
+print(SAPR)
+print(MRVE)
+print(ITSA)
 
 ### CALCULO DA CARTEIRA REAL ###
 
-class CarteiraReal:
+class Portifolio:
     def __init__(self,name):
         self.name = name
         self.composicao = {}
         self.vlrTotal = 0 
 
     def add_asset(self, asset):
-        self.composicao[asset.asset.ticker] = (asset.asset.price * asset.QtdAsset)
-        self.vlrTotal = self.vlrTotal + (asset.asset.price * asset.QtdAsset)
-    
+        self.composicao[asset.ticker+"%REF"] = asset.perc
+        self.composicao[asset.ticker] = (asset.price * asset.QtdAsset)
+        self.vlrTotal = self.vlrTotal + (asset.price * asset.QtdAsset)
+ 
+    # selecionar somente as chaves que referencia o asset padrao.
     def calc_perc(self):
         aux = {}
         for x in self.composicao.keys():
-            y = x[0:len(x)]+"_%"
-            aux[y]=round(self.composicao[x]/self.vlrTotal,2)*100
+            a = x[len(x)-2:len(x)]
+            if x[len(x)-2:len(x)] == "SA":
+                y = x[0:len(x)]+"_%"
+                aux[y]=round(self.composicao[x]/self.vlrTotal,2)*100
 
         for x in aux.keys():
             self.composicao[x]=aux[x]
 
     def __str__(self):
-        return f"Class CarteiraReal: {self.name} | {self.vlrTotal} | {self.composicao}"
+        return f"Class Portifolio: {self.name} | {self.vlrTotal} | {self.composicao}"
 
-print("#### 4 ####")
-MinhaCarteira = CarteiraReal("Minha Carteira")
-MinhaCarteira.add_asset(stock2)
-MinhaCarteira.add_asset(stock1)
+
+print("### 3 ### - Composicao Portifolio Preco Atual")
+MinhaCarteira = Portifolio("Minha Carteira")
+MinhaCarteira.add_asset(SAPR)
+MinhaCarteira.add_asset(MRVE)
+MinhaCarteira.add_asset(ITSA)
+
 print(MinhaCarteira)
 
 # funcao para calcular percentual de cada ativo em relacao ao patrimonio total
+
 MinhaCarteira.calc_perc()
-print("### 5 #### Carteira apos apuracao do percentual vs patrimonio total ")
+print("### 4 ### Carteira apos apuracao do percentual vs patrimonio total ")
 print(MinhaCarteira)
-    
-#print(SAPR.perc)
-#print(MinhaCarteira.composicao[SAPR.ticker+"_%"])
 
-#if (SAPR.perc > MinhaCarteira.composicao[SAPR.ticker+"_%"]):
-#    print ('Compra')
-#else:
-#    print('Aguarda') 
-
-#print(MRVE.perc)
-#print(MinhaCarteira.composicao[MRVE.ticker+"_%"])
-
-#if (MRVE.perc > MinhaCarteira.composicao[MRVE.ticker+"_%"]):
-#    print ('Compra')
-#else:
-#    print('Aguarda')
