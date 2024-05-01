@@ -23,7 +23,7 @@ class Asset:
         if operation.ope > 0: # buy
            # Calc average price
            if self.Mprice == 0:
-              self.Mprice = round(operation.price + operation.tax,2)
+              self.Mprice = round(operation.price + (operation.tax/operation.quantity),2)
               self.QtdAsset = operation.quantity
            else:  #sell
                self.Mprice = round(((self.Mprice * self.QtdAsset) + (operation.price * operation.quantity + operation.tax))/ (self.QtdAsset + operation.quantity),2)
