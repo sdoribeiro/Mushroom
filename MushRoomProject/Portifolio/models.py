@@ -4,10 +4,13 @@ from django.db import models
 
 class Asset(models.Model):
     ticker = models.CharField(max_length=10)
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    percRef = models.DecimalField(max_digits=5, decimal_places=2)
+    price = models.DecimalField(max_digits=5, decimal_places=2)
+    avgPrice = models.DecimalField(max_digits=10, decimal_places=2)
+    quantity = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"f{self.id}: ticker {self.ticker} price {self.price}"
+        return f"f{self.id}: ticker {self.ticker} price {self.percRef} avgPrice {avgPrice} Quantity {quantity}"
 
 
 class Portifolio (models.Model):
