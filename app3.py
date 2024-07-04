@@ -1,11 +1,10 @@
 import yfinance as yf
-import json
 import datetime
 
 # Automacao da gestao de uma carteira de investimentos com base nos percentuais de alocacao pre estabelecidos
 # e ativos selecionados.
 
-class Asset:
+class LocalAsset:
     def __init__(self, ticker, perc):
         self.ticker = ticker
         # using yfinance to get ticker data
@@ -34,7 +33,7 @@ class Asset:
     def __str__(self):
         return f"Asset class: Ticker {self.ticker} | Name {self.name} | Price: {self.price} | Perc: {self.percRef} | Mprice: {self.Mprice} | QtdAsset: {self.QtdAsset}"
   
-class Reit(Asset):
+class Reit(LocalAsset):
     pass 
 
 class Operation:
@@ -62,10 +61,13 @@ class Sell(Operation):
      def __str__(self):
         return f"Sell Operation: Asset {self.asset} | Date {self.date} | Qtd {self.quantity} | Price  {self.price * self.ope} | {self.tax}"
 
-SAPR = Asset('SAPR11.SA',40.0)
-MRVE = Asset('MRVE3.SA', 10.0)
-ITSA = Asset('ITSA4.SA', 30)
-ABEV = Asset('ABEV3.SA',10)
+
+
+
+SAPR = LocalAsset('SAPR11.SA',40.0)
+MRVE = LocalAsset('MRVE3.SA', 10.0)
+ITSA = LocalAsset('ITSA4.SA', 30)
+ABEV = LocalAsset('ABEV3.SA',10)
 HGLG = Reit('HGLG11.SA',10.0)
 IRDM = Reit('IRDM11.SA',10.00)
 KNRI = Reit('KNRI11.SA', 10.00)
@@ -174,8 +176,11 @@ class Portifolio:
             self.composicao[x]=round(aux[x],2)
 
     def show_data(self):
-        for x in self.composicao.keys():
-            print (self.composicao[x])
+            for x in self.composicao.keys():
+                
+                if x[len(x)-2:len(x)] == "SA":
+                    ticker = x[0:len(x)-3]
+                    print (x, self.composicao[x], self.composicao[x+"%REF"], self.composicao[ticker+"Rec"])
 
     def __str__(self):
         return f"Class Portifolio: {self.name} | {self.vlrTotal} | {self.composicao} "
@@ -198,4 +203,7 @@ print(MinhaCarteira)
 MinhaCarteira.calc_perc()
 print("### 4 ### Carteira apos apuracao do percentual vs patrimonio total ")
 print(MinhaCarteira)
+
+MinhaCarteira.show_data()
+
 
