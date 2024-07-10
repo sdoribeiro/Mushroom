@@ -1,6 +1,9 @@
 import yfinance as yf
-import json
+
 import datetime
+import pandas as pd
+import IPython.display as display
+from IPython.display import display
 
 # Automacao da gestao de uma carteira de investimentos com base nos percentuais de alocacao pre estabelecidos
 # e ativos selecionados.
@@ -150,37 +153,32 @@ print(HGRE)
 class Portifolio:
     def __init__(self,name):
         self.name = name
-        self.composicao = {}
+        #self.composicao = {}
+        self.dicionario = {"ticker": [],
+                           "valor": [],
+                           "percRef": [],
+                           "percCor": []
+                        }
         self.vlrTotal = 0
 
     def add_asset(self, asset):
-        self.composicao[asset.ticker+"%REF"] = asset.percRef
-        self.composicao[asset.ticker] = (asset.price * asset.QtdAsset)
-        self.vlrTotal = self.vlrTotal + (asset.price * asset.QtdAsset)
- 
+        #self.composicao[asset.ticker+"%REF"] = asset.percRef
+        #self.composicao[asset.ticker] = round(asset.price * asset.QtdAsset,2)
+        self.vlrTotal = self.vlrTotal + round(asset.price * asset.QtdAsset,2)
+        self.dicionario["ticker"].append(asset.ticker)
+        self.dicionario["valor"].append(round(asset.price * asset.QtdAsset,2))
+        self.dicionario["percRef"].append(asset.percRef)
+        
     # Calc percentual do ativo em relacao ao patrimonio total
     def calc_perc(self):
-        aux = {}
-        for x in self.composicao.keys():
-            
-            # selecionar somente as chaves de referencia do asset padrao.
-            if x[len(x)-2:len(x)] == "SA":
-                ticker = x[0:len(x)-3]
-                y = ticker+"%Calc"
-                aux[y]=round((self.composicao[x]/self.vlrTotal)*100,2)
-                # Rec > 0 buy Rec <0 wait
-                aux[ticker+"Rec"] = self.composicao[ticker+".SA%REF"] - aux[y]
-        for x in aux.keys():
-            self.composicao[x]=round(aux[x],2)
 
-    def show_data(self):
-        for x in self.composicao.keys():
-            print (self.composicao[x])
+        for x in self.dicionario["valor"]:
+            self.dicionario["percCor"].append(round(x/self.vlrTotal*100,2))
 
     def __str__(self):
-        return f"Class Portifolio: {self.name} | {self.vlrTotal} | {self.composicao} "
+        return f"Class Portifolio: {self.name} | {self.vlrTotal} |  {self.dicionario} "
 
-print("### 3 ### - Composicao Portifaolio Preco Atual")
+print("### 3 ### - Composicao Portifolio Preco Atual")
 MinhaCarteira = Portifolio("Minha Carteira")
 MinhaCarteira.add_asset(SAPR)
 MinhaCarteira.add_asset(MRVE)
@@ -191,11 +189,24 @@ MinhaCarteira.add_asset(IRDM)
 MinhaCarteira.add_asset(KNRI)
 MinhaCarteira.add_asset(HGRE)
 
-print(MinhaCarteira)
-
 # funcao para calcular percentual de cada ativo em relacao ao patrimonio total
-
 MinhaCarteira.calc_perc()
 print("### 4 ### Carteira apos apuracao do percentual vs patrimonio total ")
 print(MinhaCarteira)
+
+
+def color_negative_red(val):
+    """
+    Takes a scalar and returns a string with
+    the css property `'color: red'` for negative
+    strings, black otherwise.
+    """
+    color = 'blue' if val > 90 else 'black'
+    return 'color: % s' % color
+
+df = pd.DataFrame(MinhaCarteira.dicionario)
+
+display(df)
+
+df.style.applymap(color_negative_red)
 
