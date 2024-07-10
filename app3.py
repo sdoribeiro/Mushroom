@@ -1,5 +1,4 @@
 import yfinance as yf
-
 import datetime
 import pandas as pd
 import IPython.display as display
@@ -8,7 +7,7 @@ from IPython.display import display
 # Automacao da gestao de uma carteira de investimentos com base nos percentuais de alocacao pre estabelecidos
 # e ativos selecionados.
 
-class Asset:
+class LocalAsset:
     def __init__(self, ticker, perc):
         self.ticker = ticker
         # using yfinance to get ticker data
@@ -37,7 +36,7 @@ class Asset:
     def __str__(self):
         return f"Asset class: Ticker {self.ticker} | Name {self.name} | Price: {self.price} | Perc: {self.percRef} | Mprice: {self.Mprice} | QtdAsset: {self.QtdAsset}"
   
-class Reit(Asset):
+class Reit(LocalAsset):
     pass 
 
 class Operation:
@@ -65,10 +64,13 @@ class Sell(Operation):
      def __str__(self):
         return f"Sell Operation: Asset {self.asset} | Date {self.date} | Qtd {self.quantity} | Price  {self.price * self.ope} | {self.tax}"
 
-SAPR = Asset('SAPR11.SA',40.0)
-MRVE = Asset('MRVE3.SA', 10.0)
-ITSA = Asset('ITSA4.SA', 30)
-ABEV = Asset('ABEV3.SA',10)
+
+
+
+SAPR = LocalAsset('SAPR11.SA',40.0)
+MRVE = LocalAsset('MRVE3.SA', 10.0)
+ITSA = LocalAsset('ITSA4.SA', 30)
+ABEV = LocalAsset('ABEV3.SA',10)
 HGLG = Reit('HGLG11.SA',10.0)
 IRDM = Reit('IRDM11.SA',10.00)
 KNRI = Reit('KNRI11.SA', 10.00)
@@ -208,5 +210,5 @@ df = pd.DataFrame(MinhaCarteira.dicionario)
 
 display(df)
 
-df.style.applymap(color_negative_red)
+
 
